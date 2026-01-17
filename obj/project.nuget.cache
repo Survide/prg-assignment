@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "CLS3ZrFe3XM=",
+  "dgSpecHash": "jHi/ap5SBL8=",
   "success": true,
-  "projectFilePath": "/Users/nicoletan/Documents/prg-assignment/prg-asg.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/home/survi/Projects/prg-asg/prg-asg.csproj",
+  "expectedPackageFiles": [
+    "/home/survi/.nuget/packages/microsoft.aspnetcore.app.ref/10.0.0/microsoft.aspnetcore.app.ref.10.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

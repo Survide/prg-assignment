@@ -8,19 +8,19 @@
     "net10.0": []
   },
   "packageFolders": {
-    "/Users/nicoletan/.nuget/packages/": {}
+    "/home/survi/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/nicoletan/Documents/prg-assignment/prg-asg.csproj",
+      "projectUniqueName": "/home/survi/Projects/prg-asg/prg-asg.csproj",
       "projectName": "prg-asg",
-      "projectPath": "/Users/nicoletan/Documents/prg-assignment/prg-asg.csproj",
-      "packagesPath": "/Users/nicoletan/.nuget/packages/",
-      "outputPath": "/Users/nicoletan/Documents/prg-assignment/obj/",
+      "projectPath": "/home/survi/Projects/prg-asg/prg-asg.csproj",
+      "packagesPath": "/home/survi/.nuget/packages/",
+      "outputPath": "/home/survi/Projects/prg-asg/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/nicoletan/.nuget/NuGet/NuGet.Config"
+        "/home/survi/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -60,12 +60,18 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[10.0.0, 10.0.0]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.101/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/10.0.100/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

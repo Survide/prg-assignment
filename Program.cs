@@ -67,6 +67,43 @@ void LoadFoodItems()
         Console.WriteLine($"{foodItems.Count()} food items loaded!");
     }
 }
+
+void LoadCustomers()
+{
+}
+
+void LoadOrders()
+{
+}
+
+void MainMenu()
+{
+    while (true)
+    {
+        Console.WriteLine("===== Gruberoo Food Delivery System =====");
+        Console.WriteLine("1. List all restaurants and menu items");
+        Console.WriteLine("2. List all orders");
+        Console.WriteLine("3. Create a new order");
+        Console.WriteLine("4. Process an order");
+        Console.WriteLine("5. Modify an existing order");
+        Console.WriteLine("6. Delete an existing order");
+        Console.WriteLine("0. Exit");
+        Console.Write("Enter your choice: ");
+
+        int option = 7;
+        try
+        {
+            option = Convert.ToInt16(Console.ReadLine());
+        }
+        catch (FormatException ex)
+        {
+            Console.WriteLine("Could not convert to Int16");
+            Console.WriteLine($"Error message: {ex.Message}");
+        }
+    }
+
+}
+
 void InitializeGruberoo()
 {
     Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
