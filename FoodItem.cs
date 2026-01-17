@@ -15,6 +15,13 @@ public class FoodItem
         Customise = customise;
     }
 
-    public override string ToString() { return ""; }
+    public override string ToString()
+    {
+        return
+          "ItemName: " + ItemName +
+          " ItemDesc: " + ItemDesc +
+          " ItemPrice: " + ItemPrice +
+          " Customise: " + Customise;
+    }
 
 }
