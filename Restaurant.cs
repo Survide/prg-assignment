@@ -12,9 +12,9 @@ public class Restaurant
     public Restaurant(
         string restaurantId,
         string restaurantName,
-        string restaurantEmail,
-        List<Menu> menus,
-        List<SpecialOffer> offers
+        string restaurantEmail
+    // List<Menu> menus,
+    // List<SpecialOffer> offers
     )
     {
         RestaurantId = restaurantId;
@@ -22,8 +22,8 @@ public class Restaurant
         RestaurantEmail = restaurantEmail;
 
         Orders = [];
-        Menus = menus;
-        SpecialOffers = offers;
+        Menus = [];
+        SpecialOffers = [];
     }
 
     public void DisplayOrders()

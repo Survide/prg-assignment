@@ -8,11 +8,13 @@ public class SpecialOffer
 
     public List<Order> Orders { get; set; }
 
-    public SpecialOffer(string offerCode, string offerDesc, double discount)
+    public SpecialOffer(string offerCode, string offerDesc, double discount, List<Order> orders)
     {
         OfferCode = offerCode;
         OfferDesc = offerDesc;
         Discount = discount;
+
+        Orders = orders;
     }
 
     public override string ToString()

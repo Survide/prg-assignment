@@ -1,6 +1,6 @@
 
 # Features
-1. - [ ] Load files
+1. - [x] Load files
 2. - [ ] Load files
 3. - [ ] List all restaurants and menu items
 4. - [ ] List all orders with basic information
