@@ -1,8 +1,8 @@
 ﻿
 using prg_asg;
 
-List<Restaurant> restaurants = new List<Restaurant>();
-List<FoodItem> foodItems = new List<FoodItem>();
+List<Restaurant> restaurants = [];
+List<FoodItem> foodItems = [];
 
 void LoadRestaurants()
 {

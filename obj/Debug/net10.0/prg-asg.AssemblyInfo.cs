@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("prg-asg")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f41a06b6a402ef4a71f7326a5fb288faabdbb140")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+74a2ddfb6298848c259f9d54de4986f324bace68")]
 [assembly: System.Reflection.AssemblyProductAttribute("prg-asg")]
 [assembly: System.Reflection.AssemblyTitleAttribute("prg-asg")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -13,3 +13,11 @@
 /home/survi/Projects/prg-asg/obj/Debug/net10.0/prg-asg.pdb
 /home/survi/Projects/prg-asg/obj/Debug/net10.0/prg-asg.genruntimeconfig.cache
 /home/survi/Projects/prg-asg/obj/Debug/net10.0/ref/prg-asg.dll
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.GeneratedMSBuildEditorConfig.editorconfig
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.AssemblyInfoInputs.cache
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.AssemblyInfo.cs
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.csproj.CoreCompileInputs.cache
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.sourcelink.json
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.dll
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/refint/prg-asg.dll
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.pdb

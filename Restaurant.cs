@@ -9,14 +9,15 @@ public class Restaurant
     public List<Order> Orders { get; set; }
     public List<SpecialOffer> SpecialOffers { get; set; }
 
-    public Restaurant(string restaurantId, string restaurantName, string restaurantEmail)
+    public Restaurant(string restaurantId, string restaurantName, string restaurantEmail, List<Menu> menus, List<SpecialOffer> offers)
     {
         RestaurantId = restaurantId;
         RestaurantName = restaurantName;
         RestaurantEmail = restaurantEmail;
-        Menus = new List<Menu>();
-        Orders = new List<Order>();
-        SpecialOffers = new List<SpecialOffer>();
+
+        Orders = [];
+        Menus = menus;
+        SpecialOffers = offers;
     }
 
     public void DisplayOrders()

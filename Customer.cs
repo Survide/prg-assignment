@@ -6,11 +6,12 @@ public class Customer
     public string CustomerName { get; set; }
     public List<Order> Orders { get; set; }
 
-    public Customer(string emailAddress, string customerName)
+    public Customer(string emailAddress, string customerName, List<Order> orders)
     {
         EmailAddress = emailAddress;
         CustomerName = customerName;
-        Orders = new List<Order>();
+
+        Orders = orders;
     }
 
     public void AddOrder(Order order)

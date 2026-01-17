@@ -10,15 +10,22 @@ public class Order
     public string DeliveryAddress { get; set; }
     public string OrderPaymentMethod { get; set; }
     public bool OrderPaid { get; set; }
-    public List<OrderedFoodItem> OrderedFoodItems { get; set; }
 
-    public Order()
+    public List<OrderedFoodItem> OrderedFoodItems { get; set; }
+    public Restaurant FromRestaurant {get; set;}
+    public Customer FromCustomer {get; set;}
+    public SpecialOffer Offer {get; set;}
+
+    public Order(SpecialOffer _offer, List<OrderedFoodItem> orderedFoodItems)
     {
         OrderId = new Random().Next();
         OrderDateTime = DateTime.Now;
         OrderTotal = CalculateOrderTotal();
         OrderStatus = "Pending";
         OrderPaid = false;
+        
+        Offer = _offer;
+        OrderedFoodItems = orderedFoodItems;
     }
 
     public double CalculateOrderTotal()
