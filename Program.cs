@@ -1,5 +1,4 @@
-﻿
-using System.Globalization;
+﻿using System.Globalization;
 using prg_asg;
 
 Dictionary<string, Restaurant> restaurants = [];
@@ -211,39 +210,18 @@ void CreateOrder()
     Console.WriteLine("Create New Order");
     Console.WriteLine("==============================");
 
-    // TODO: Input validation
-    Console.Write("Enter Customer Email: ");
-    string email = Console.ReadLine()!;
+    // get inputs
+    string email = Helper.GetValidInput("Enter Customer Email: ", "Invalid email entered.", s => customers.ContainsKey(s));
+    string restaurantId = Helper.GetValidInput("Enter Restaurant ID: ", "Invalid Restaurant ID entered.", s => restaurants.ContainsKey(s));
+    string date = Helper.GetValidInput("Enter Delivery Date (dd/mm/yyyy): ", "Invalid date entered.", s => DateTime.TryParseExact(s, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out _));
+    string time = Helper.GetValidInput("Enter Delivery Time (hh:mm): ", "Invalid time entered.", s => DateTime.TryParseExact(s, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out _));
+    string address = Helper.GetValidInput("Enter Delivery Address: ", "Invalid address entered.");
 
-    // TODO: Input validation
-    Console.Write("Enter Restaurant ID: ");
-    string restaurantId = Console.ReadLine()!;
-
-    Console.Write("Enter Delivery Date (dd/mm/yyyy): ");
-    string dateInput = Console.ReadLine()!;
-
-    Console.Write("Enter Delivery Time (hh:mm): ");
-    string timeInput = Console.ReadLine()!;
-    
-    DateTime date; 
-
-    while (!DateTime.TryParseExact(dateInput + " " + timeInput, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
-    {
-        Console.WriteLine("\nInvalid date & time entered.");
-        Console.Write("Enter Delivery Date (dd/mm/yyyy): ");
-        dateInput = Console.ReadLine()!;
-
-        Console.Write("Enter Delivery Time (hh:mm): ");
-        timeInput = Console.ReadLine()!;
-    }
-
-    Console.Write("Enter Delivery Address: ");
-    string address = Console.ReadLine()!;
-
-    // display available FoodItems
+    DateTime dateTime = DateTime.ParseExact(date + " " + time, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
     Restaurant thisRest = restaurants[restaurantId];
     Customer thisCust = customers[email];
 
+    // display available FoodItems
     Console.WriteLine("\nAvailable Food Items: ");
     // FIXME: Assume only got 1 menu
     int itemNumber = 1;
@@ -255,17 +233,15 @@ void CreateOrder()
     // allow the user to select multiple items and quantity
     List<OrderedFoodItem> orderItems = [];
     List<string> itemsParsed = []; // for csv storing
-
+    
+    int itemsCount = thisRest.Menus[0].FoodItems.Count;
     itemNumber = -1;
     while (itemNumber != 0) {
-        Console.Write("Enter item number (0 to finish): ");
-        // TODO: Input validation
-        itemNumber = int.Parse(Console.ReadLine()!);
+        itemNumber = int.Parse(Helper.GetValidInput("Enter item number (0 to finish): ", "Invalid item number entered", s => int.TryParse(s, out int val) && val >= 0 && val <= itemsCount));
     
         if(itemNumber == 0) break;
    
-        Console.Write("Enter quantity: ");
-        int quantity = int.Parse(Console.ReadLine()!);
+        int quantity = int.Parse(Helper.GetValidInput("Enter quantity: ", "Invalid quantity entered", s => int.TryParse(s, out int val) && val > 0));
         
         // create new OrderedFoodItems
         // FIXME: Assume only got 1 menu 
@@ -278,17 +254,16 @@ void CreateOrder()
     }
 
     // apply special requests 
-    Console.Write("Add special request? [Y/N]: ");
-    // TODO: Input validation (Y/N)
-    string ifReq = Console.ReadLine()!.ToUpper();
+    string ifReq = Helper.GetValidInput("Add special request? [Y/N]: ", "Invalid input.", s => s.ToUpper() == "Y" || s.ToUpper() == "N").ToUpper();
     if (ifReq == "Y") {
-        string request = Console.ReadLine()!;
+        // FIXME: Not sure what request is for
+        string request = Helper.GetValidInput("Enter request: ", "Request cannot be empty.");
     }
   
     // create new Order 
     Order newOrder = new() {
         DeliveryAddress = address,
-        DeliveryDateTime = date,
+        DeliveryDateTime = dateTime,
         OrderedFoodItems = orderItems,
         OrderDateTime = DateTime.Now,
         
@@ -300,15 +275,14 @@ void CreateOrder()
     
     // calculate order total
     Console.WriteLine($"\nOrder Total: ${orderTotal:f2} + $5.00 (delivery) = ${orderTotal + 5:f2}");
-    Console.Write("Proceed to payment? [Y/N]: ");
-    // TODO: Input validation
-    string ifPayment = Console.ReadLine()!.ToUpper();
+
+    string ifPayment = Helper.GetValidInput("Proceed to payment? [Y/N]: ", "Invalid input.", s => s.Equals("Y", StringComparison.OrdinalIgnoreCase) || s.Equals("N", StringComparison.OrdinalIgnoreCase)).ToUpper();
     if(ifPayment == "N") return;
 
     // prompt user for payment method 
-    Console.Write("\nPayment method: [CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ");
-    // TODO: Input validation
-    string paymentMethod = Console.ReadLine()!;
+    string[] validOptions = [ "CC", "PP", "CD" ]; 
+
+    string paymentMethod = Helper.GetValidInput("\nPayment method: [CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ", "Invalid payment method entered.", s => validOptions.Contains(s, StringComparer.OrdinalIgnoreCase));
     newOrder.OrderPaymentMethod = paymentMethod;
 
     // update status 
@@ -322,12 +296,14 @@ void CreateOrder()
     thisCust.Orders.Add(newOrder);
 
     // create csv item
-    string orderStr = $"{newOrder.OrderId},{newOrder.FromCustomer.EmailAddress},{newOrder.FromRestaurant.RestaurantId},{dateInput},{timeInput},{address},{newOrder.OrderDateTime:dd/MM/yyyy HH:mm},{orderTotal},{newOrder.OrderStatus},\"{string.Join("|",itemsParsed)}\"";
+    string orderStr = $"{newOrder.OrderId},{newOrder.FromCustomer.EmailAddress},{newOrder.FromRestaurant.RestaurantId},{date},{time},{address},{newOrder.OrderDateTime:dd/MM/yyyy HH:mm},{orderTotal},{newOrder.OrderStatus},\"{string.Join("|",itemsParsed)}\"";
     
     // append order to orders.csv 
     File.AppendAllText("data/orders.csv", orderStr);
 
+    Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine($"\nOrder {newOrder.OrderId} created successfully! Status: {newOrder.OrderStatus}");
+    Console.ResetColor();
 }
 
 void ProcessOrder()
