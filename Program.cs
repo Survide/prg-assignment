@@ -169,7 +169,18 @@ void LoadOrders()
                 if (isFound) break;
             }
 
-            Order newOrder = new Order(int.Parse(orderId), DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), deliveryAddress, double.Parse(totalAmount), status, null, foodItems);
+            Order newOrder = new Order(
+                int.Parse(orderId),
+                DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
+                DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
+                deliveryAddress,
+                double.Parse(totalAmount),
+                status,
+                thisCust,
+                thisRest,
+                null,
+                foodItems
+            );
 
             // place them into the Restaurant’s Order Queue and the Customer’s Order List
             thisRest.Orders.Enqueue(newOrder);
@@ -187,6 +198,35 @@ void ListRestaurantsAndMenu()
 
 void ListAllOrders()
 {
+    Console.WriteLine("All Orders");
+    Console.WriteLine("==========");
+    Console.WriteLine(
+    $"{"Order ID",-10}" +
+    $"{"Customer",-15}" +
+    $"{"Restaurant",-20}" +
+    $"{"Delivery Date/Time",-20}" +
+    $"{"Amount",-8}" +
+    $"{"Status"}"
+    );
+    Console.WriteLine(
+    $"{"________",-10}" +
+    $"{"________",-15}" +
+    $"{"__________",-20}" +
+    $"{"__________________",-20}" +
+    $"{"______",-8}" +
+    $"{"______"}"
+    );
+    foreach (Order order in orders.Values)
+    {
+        Console.WriteLine(
+        $"{order.OrderId,-10}" +
+        $"{order.FromCustomer.CustomerName,-15}" +
+        $"{order.FromRestaurant.RestaurantName,-20}" +
+        $"{order.DeliveryDateTime.ToString("dd/MM/yyyy HH:mm"),-20}" + // need format
+        $"${order.OrderTotal.ToString("F2"),-7}" +
+        order.OrderStatus
+        );
+    }
 }
 
 void CreateOrder()
@@ -209,6 +249,7 @@ void MainMenu()
 {
     while (true)
     {
+        Console.WriteLine();
         Console.WriteLine("===== Gruberoo Food Delivery System =====");
         Console.WriteLine("1. List all restaurants and menu items");
         Console.WriteLine("2. List all orders");

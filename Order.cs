@@ -12,16 +12,30 @@ public class Order
     public bool OrderPaid { get; set; }
 
     public List<OrderedFoodItem> OrderedFoodItems { get; set; }
-    public Restaurant FromRestaurant {get; set;}
-    public Customer FromCustomer {get; set;}
-    public SpecialOffer Offer {get; set;}
+    public Restaurant FromRestaurant { get; set; }
+    public Customer FromCustomer { get; set; }
+    public SpecialOffer Offer { get; set; }
 
-    public Order(int orderId, DateTime orderDateTime, DateTime deliveryDateTime, string address, double total, string status, SpecialOffer offer, List<OrderedFoodItem> orderedFoodItems)
+    public Order(
+        int orderId,
+        DateTime orderDateTime,
+        DateTime deliveryDateTime,
+        string address,
+        double total,
+        string status,
+        Customer fromCustomer,
+        Restaurant fromRestaurant,
+        SpecialOffer offer,
+        List<OrderedFoodItem> orderedFoodItems
+    )
     {
         OrderId = orderId;
         OrderDateTime = orderDateTime;
         OrderTotal = total;
         OrderStatus = status;
+
+        FromCustomer = fromCustomer;
+        FromRestaurant = fromRestaurant;
 
         DeliveryDateTime = deliveryDateTime;
         DeliveryAddress = address;
