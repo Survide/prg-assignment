@@ -1,11 +1,13 @@
-﻿namespace prg_asg;
+﻿using System.Collections;
+
+namespace prg_asg;
 
 public class Restaurant
 {
     public string RestaurantId { get; set; }
     public string RestaurantName { get; set; }
     public string RestaurantEmail { get; set; }
-    public List<Order> Orders { get; set; }
+    public Queue<Order> Orders { get; set; }
     public List<Menu> Menus { get; set; }
     public List<SpecialOffer> SpecialOffers { get; set; }
 

@@ -21,3 +21,10 @@
 /Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.dll
 /Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/refint/prg-asg.dll
 /Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.pdb
+/Users/nicoletan/Documents/prg-assignment/bin/Debug/net10.0/prg-asg
+/Users/nicoletan/Documents/prg-assignment/bin/Debug/net10.0/prg-asg.deps.json
+/Users/nicoletan/Documents/prg-assignment/bin/Debug/net10.0/prg-asg.runtimeconfig.json
+/Users/nicoletan/Documents/prg-assignment/bin/Debug/net10.0/prg-asg.dll
+/Users/nicoletan/Documents/prg-assignment/bin/Debug/net10.0/prg-asg.pdb
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/prg-asg.genruntimeconfig.cache
+/Users/nicoletan/Documents/prg-assignment/obj/Debug/net10.0/ref/prg-asg.dll

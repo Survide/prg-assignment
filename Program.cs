@@ -4,14 +4,15 @@ using prg_asg;
 
 Dictionary<string, Restaurant> restaurants = [];
 List<FoodItem> foodItems = [];
-List<Order> orders = [];
-Dictionary<Customer, Order> customerOrders = []; // stores the customer: their order
+Dictionary<string, Menu> menus = []; // restaurantId: menu
+Dictionary<string, Customer> customers = []; // email: customer
+Dictionary<string, Order> orders = []; // orderId: order
 
 void LoadRestaurants()
 {
     try
     {
-        string[] records = File.ReadAllLines("data/restaurants.csv").Skip(1).ToArray();
+        string[] records = [.. File.ReadAllLines("data/restaurants.csv").Skip(1)];
         foreach (string record in records)
         {
             string[] details = record.Split(",");
@@ -25,17 +26,16 @@ void LoadRestaurants()
     }
     finally
     {
-        Console.WriteLine($"{restaurants.Count()} restaurants loaded!");
+        Console.WriteLine($"{restaurants.Count} restaurants loaded!");
     }
 }
 
 void LoadFoodItems()
 {
     string[] records = [];
-    Dictionary<string, Menu> menus = new Dictionary<string, Menu>();
     try
     {
-        records = File.ReadAllLines("data/fooditems.csv").Skip(1).ToArray();
+        records = [.. File.ReadAllLines("data/fooditems.csv").Skip(1)];
     }
     catch (FileNotFoundException ex)
     {
@@ -89,49 +89,88 @@ void LoadFoodItems()
             menus.Add(details[0], new Menu(details[0], "Main Menu", [foodItem]));
         }
     }
-    Console.WriteLine($"{foodItems.Count()} food items loaded!");
+    Console.WriteLine($"{foodItems.Count} food items loaded!");
 }
 
 void LoadCustomers()
 {
+    string[] records = [];
+    try {
+        records = [.. File.ReadAllLines("data/customers.csv").Skip(1)];
+    } catch(FileNotFoundException ex) {
+        Console.WriteLine("Customers file not found!");
+        Console.WriteLine($"Error message {ex.Message}");
+    } 
+    foreach(string record in records) {
+        string[] split = record.Split(",");
+        (string name, string email) = (split[0], split[1]);
+
+        //  FIXME:: Passed in empty [] for orders since Customers have to be loaded b4 orders
+        Customer c = new(email, name, []);
+        customers[email] = c;
+    }
+
+    Console.WriteLine($"{customers.Count} customers loaded!");
 }
 
 void LoadOrders()
 {
+    string[] records = [];
     try
     {
-        string[] records = File.ReadAllLines("data/orders.csv").Skip(1).ToArray();
-        foreach (string record in records)
-        {
-            string[] d = record.Split(",");
-
-            (string orderId, string customerEmail, string restaurantId, string deliveryDate, string deliveryTime, string deliveryAddress, string createdDateTime, string totalAmount, string status, string itemsRaw) = (d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8], d[9]);
-
-            List<OrderedFoodItem> foodItems = [];
-            string[] itemsParsed = itemsRaw.Split("|");
-            Restaurant res = restaurants[restaurantId];
-            // TODO: get food item based on Restaurant.Menu.FoodItem
-            for (int i = 0; i < itemsParsed.Length; i++)
-            {
-                string[] s = itemsParsed[i].Split(",");
-                (string name, int qty) = (s[0], int.Parse(s[1]));
-                // OrderedFoodItem item = new(name, "", );
-            }
-
-            // OrderId,CustomerEmail,RestaurantId,DeliveryDate,DeliveryTime,DeliveryAddress,CreatedDateTime,TotalAmount,Status,Items
-            Order newOrder = new Order(int.Parse(orderId), DateTime.ParseExact(createdDateTime, "MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture), DateTime.ParseExact(deliveryDate + " " + deliveryTime, "MM/dd/yyyy HH:mm", CultureInfo.InvariantCulture), deliveryAddress, double.Parse(totalAmount), status, null, foodItems);
-        }
+        records = [.. File.ReadAllLines("data/orders.csv").Skip(1)];
     }
     catch (FileNotFoundException ex)
     {
-        Console.WriteLine("Restaurants file not found!");
+        Console.WriteLine("Orders file not found!");
         Console.WriteLine($"Error message {ex.Message}");
     }
-    finally
+  
+    foreach (string record in records)
     {
-        Console.WriteLine($"{restaurants.Count()} restaurants loaded!");
-    }
+        // get the food items 
+        int startOfItems = record.IndexOf('"');
+        string[] d = record[0..startOfItems].Split(",");
+        string itemsRaw = record[startOfItems..^0];
 
+        (string orderId, string customerEmail, string restaurantId, string deliveryDate, string deliveryTime, string deliveryAddress, string createdDateTime, string totalAmount, string status) = (d[0], d[1], d[2], d[3], d[4], d[5], d[6], d[7], d[8]);
+
+        List<OrderedFoodItem> foodItems = [];
+        Restaurant thisRest = restaurants[restaurantId];
+        Customer thisCust = customers[customerEmail];
+
+        string[] itemsParsed = itemsRaw[1..^1].Split("|");
+        for (int i = 0; i < itemsParsed.Length; i++)
+        {
+            string[] s = itemsParsed[i].Split(",");
+            string name = s[0];
+            int qty = s.Length == 1 ? 1 : int.Parse(s[1].Trim()); // by default qty = 1 
+
+            // find the foodItem in restaurant's menu 
+            bool isFound = false;
+            foreach(Menu menu in thisRest.Menus) {
+                foreach(FoodItem item in menu.FoodItems) {
+                    // check for this item 
+                    if (item.ItemName == name) {
+                        isFound = true;
+                        OrderedFoodItem f = new(item, qty);
+                        foodItems.Add(f);
+                        break;
+                    }
+                }
+                if (isFound) break;
+            }
+
+            Order newOrder = new Order(int.Parse(orderId), DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), deliveryAddress, double.Parse(totalAmount), status, null, foodItems);
+
+            // place them into the Restaurant’s Order Queue and the Customer’s Order List
+            thisRest.Orders.Enqueue(newOrder);
+            thisCust.AddOrder(newOrder);
+            
+            orders[orderId] = newOrder;
+        }
+    }
+    Console.WriteLine($"{orders.Count} orders loaded!");
 }
 
 void ListRestaurantsAndMenu()
@@ -219,8 +258,8 @@ void InitializeGruberoo()
     Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
     LoadRestaurants();
     LoadFoodItems();
-    // LoadCustomers(); Uncomment when done
-    // LoadOrders();
+    LoadCustomers(); 
+    LoadOrders();
 }
 
 InitializeGruberoo();
