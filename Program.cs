@@ -46,48 +46,49 @@ void LoadFoodItems()
     foreach (string record in records)
     {
         FoodItem foodItem;
+        string restaurantId;
+        string name;
+        string description;
+        string stringPrice;
+        double price;
         // theres a record that has "" in description.
         if (record.Contains('"'))
         {
             string[] splitDetails = record.Split('"');
             string[] restauranntIdAndName = splitDetails[0].Substring(0, splitDetails[0].Length - 1).Split(",");
-            string restaurantId = restauranntIdAndName[0];
-            string name = restauranntIdAndName[1];
-            string description = splitDetails[1];
-            string stringPrice = splitDetails[2].Substring(1);
-            if (!double.TryParse(stringPrice, out double splitPrice))
-            {
-                Console.WriteLine($"Could not parse price to double in line: {record}");
-                continue;
-            }
-            foodItem = new FoodItem(name, description, splitPrice, "");
-            foodItems.Add(foodItem);
-            if (menus.ContainsKey(restaurantId))
-            {
-                menus[restaurantId].FoodItems.Add(foodItem);
-            }
-            else
-            {
-                menus.Add(restaurantId, new Menu(restaurantId, "Main Menu", [foodItem]));
-            }
-            continue;
+            restaurantId = restauranntIdAndName[0];
+            name = restauranntIdAndName[1];
+            description = splitDetails[1];
+            stringPrice = splitDetails[2].Substring(1);
         }
-        string[] details = record.Split(",");
-        if (!double.TryParse(details[3], out double price))
+        else
+        {
+            string[] details = record.Split(",");
+            restaurantId = details[0];
+            name = details[1];
+            description = details[2];
+            stringPrice = details[3];
+        }
+        if (!double.TryParse(stringPrice, out price))
         {
             Console.WriteLine($"Could not parse price to double in line: {record}");
             continue;
         }
-        foodItem = new FoodItem(details[1], details[2], price, "");
+        foodItem = new FoodItem(name, description, price, "");
         foodItems.Add(foodItem);
-        if (menus.ContainsKey(details[0]))
+        if (menus.ContainsKey(restaurantId))
         {
-            menus[details[0]].FoodItems.Add(foodItem);
+            menus[restaurantId].FoodItems.Add(foodItem);
         }
         else
         {
-            menus.Add(details[0], new Menu(details[0], "Main Menu", [foodItem]));
+            menus.Add(restaurantId, new Menu(restaurantId, "Main Menu", [foodItem]));
         }
+    }
+    foreach (KeyValuePair<string, Menu> kvp in menus)
+    {
+        string restaurantId = kvp.Key;
+        restaurants[restaurantId].Menus.Add(kvp.Value);
     }
     Console.WriteLine($"{foodItems.Count} food items loaded!");
 }
@@ -95,13 +96,17 @@ void LoadFoodItems()
 void LoadCustomers()
 {
     string[] records = [];
-    try {
+    try
+    {
         records = [.. File.ReadAllLines("data/customers.csv").Skip(1)];
-    } catch(FileNotFoundException ex) {
+    }
+    catch (FileNotFoundException ex)
+    {
         Console.WriteLine("Customers file not found!");
         Console.WriteLine($"Error message {ex.Message}");
-    } 
-    foreach(string record in records) {
+    }
+    foreach (string record in records)
+    {
         string[] split = record.Split(",");
         (string name, string email) = (split[0], split[1]);
 
@@ -125,7 +130,7 @@ void LoadOrders()
         Console.WriteLine("Orders file not found!");
         Console.WriteLine($"Error message {ex.Message}");
     }
-  
+
     foreach (string record in records)
     {
         // get the food items 
@@ -148,10 +153,13 @@ void LoadOrders()
 
             // find the foodItem in restaurant's menu 
             bool isFound = false;
-            foreach(Menu menu in thisRest.Menus) {
-                foreach(FoodItem item in menu.FoodItems) {
+            foreach (Menu menu in thisRest.Menus)
+            {
+                foreach (FoodItem item in menu.FoodItems)
+                {
                     // check for this item 
-                    if (item.ItemName == name) {
+                    if (item.ItemName == name)
+                    {
                         isFound = true;
                         OrderedFoodItem f = new(item, qty);
                         foodItems.Add(f);
@@ -166,7 +174,7 @@ void LoadOrders()
             // place them into the Restaurant’s Order Queue and the Customer’s Order List
             thisRest.Orders.Enqueue(newOrder);
             thisCust.AddOrder(newOrder);
-            
+
             orders[orderId] = newOrder;
         }
     }
@@ -258,7 +266,7 @@ void InitializeGruberoo()
     Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
     LoadRestaurants();
     LoadFoodItems();
-    LoadCustomers(); 
+    LoadCustomers();
     LoadOrders();
 }
 
