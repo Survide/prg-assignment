@@ -32,6 +32,10 @@ public class Order
         OrderedFoodItems = orderedFoodItems;
     }
 
+    // for the creation of newOrder
+    public Order() {}
+
+
     public double CalculateOrderTotal()
     {
         double total = 0;

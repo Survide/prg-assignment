@@ -171,6 +171,10 @@ void LoadOrders()
 
             Order newOrder = new Order(int.Parse(orderId), DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), deliveryAddress, double.Parse(totalAmount), status, null, foodItems);
 
+            // link the relations
+            newOrder.FromRestaurant = restaurants[restaurantId];
+            newOrder.FromCustomer = customers[customerEmail];
+
             // place them into the Restaurant’s Order Queue and the Customer’s Order List
             thisRest.Orders.Enqueue(newOrder);
             thisCust.AddOrder(newOrder);
@@ -203,6 +207,127 @@ void ListAllOrders()
 
 void CreateOrder()
 {
+    // prompt the user to enter Customer Email, Restaurant ID, Delivery Date/Time, Delivery Address
+    Console.WriteLine("Create New Order");
+    Console.WriteLine("==============================");
+
+    // TODO: Input validation
+    Console.Write("Enter Customer Email: ");
+    string email = Console.ReadLine()!;
+
+    // TODO: Input validation
+    Console.Write("Enter Restaurant ID: ");
+    string restaurantId = Console.ReadLine()!;
+
+    Console.Write("Enter Delivery Date (dd/mm/yyyy): ");
+    string dateInput = Console.ReadLine()!;
+
+    Console.Write("Enter Delivery Time (hh:mm): ");
+    string timeInput = Console.ReadLine()!;
+    
+    DateTime date; 
+
+    while (!DateTime.TryParseExact(dateInput + " " + timeInput, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+    {
+        Console.WriteLine("\nInvalid date & time entered.");
+        Console.Write("Enter Delivery Date (dd/mm/yyyy): ");
+        dateInput = Console.ReadLine()!;
+
+        Console.Write("Enter Delivery Time (hh:mm): ");
+        timeInput = Console.ReadLine()!;
+    }
+
+    Console.Write("Enter Delivery Address: ");
+    string address = Console.ReadLine()!;
+
+    // display available FoodItems
+    Restaurant thisRest = restaurants[restaurantId];
+    Customer thisCust = customers[email];
+
+    Console.WriteLine("\nAvailable Food Items: ");
+    // FIXME: Assume only got 1 menu
+    int itemNumber = 1;
+    foreach(FoodItem item in thisRest.Menus[0].FoodItems) {
+        Console.WriteLine($"{itemNumber}. {item.ItemName} - ${item.ItemPrice:f2}");
+        itemNumber++;
+    }
+
+    // allow the user to select multiple items and quantity
+    List<OrderedFoodItem> orderItems = [];
+    List<string> itemsParsed = []; // for csv storing
+
+    itemNumber = -1;
+    while (itemNumber != 0) {
+        Console.Write("Enter item number (0 to finish): ");
+        // TODO: Input validation
+        itemNumber = int.Parse(Console.ReadLine()!);
+    
+        if(itemNumber == 0) break;
+   
+        Console.Write("Enter quantity: ");
+        int quantity = int.Parse(Console.ReadLine()!);
+        
+        // create new OrderedFoodItems
+        // FIXME: Assume only got 1 menu 
+        FoodItem foodItem = thisRest.Menus[0].FoodItems[itemNumber - 1];
+        OrderedFoodItem orderedFoodItem = new(foodItem, quantity);
+        orderItems.Add(orderedFoodItem);
+        
+        // for csv storing
+        itemsParsed.Add($"{foodItem.ItemName},{quantity}");
+    }
+
+    // apply special requests 
+    Console.Write("Add special request? [Y/N]: ");
+    // TODO: Input validation (Y/N)
+    string ifReq = Console.ReadLine()!.ToUpper();
+    if (ifReq == "Y") {
+        string request = Console.ReadLine()!;
+    }
+  
+    // create new Order 
+    Order newOrder = new() {
+        DeliveryAddress = address,
+        DeliveryDateTime = date,
+        OrderedFoodItems = orderItems,
+        OrderDateTime = DateTime.Now,
+        
+        // For linking 
+        FromRestaurant = thisRest,
+        FromCustomer = thisCust,
+    };
+    double orderTotal = newOrder.CalculateOrderTotal();
+    
+    // calculate order total
+    Console.WriteLine($"\nOrder Total: ${orderTotal:f2} + $5.00 (delivery) = ${orderTotal + 5:f2}");
+    Console.Write("Proceed to payment? [Y/N]: ");
+    // TODO: Input validation
+    string ifPayment = Console.ReadLine()!.ToUpper();
+    if(ifPayment == "N") return;
+
+    // prompt user for payment method 
+    Console.Write("\nPayment method: [CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ");
+    // TODO: Input validation
+    string paymentMethod = Console.ReadLine()!;
+    newOrder.OrderPaymentMethod = paymentMethod;
+
+    // update status 
+    newOrder.OrderStatus = "Pending";
+    
+    // assign new order id 
+    newOrder.OrderId = 1000 + orders.Count + 1;
+    orders[newOrder.OrderId.ToString()] = newOrder;
+    
+    thisRest.Orders.Enqueue(newOrder);
+    thisCust.Orders.Add(newOrder);
+
+    // create csv item
+    string orderStr = $"{newOrder.OrderId},{newOrder.FromCustomer.EmailAddress},{newOrder.FromRestaurant.RestaurantId},{dateInput},{timeInput},{address},{newOrder.OrderDateTime:dd/MM/yyyy HH:mm},{orderTotal},{newOrder.OrderStatus},\"{string.Join("|",itemsParsed)}\"";
+    
+    // append order to orders.csv 
+    File.AppendAllText("data/orders.csv", orderStr);
+
+    Console.WriteLine($"\nOrder {newOrder.OrderId} created successfully! Status: {newOrder.OrderStatus}");
 }
 
 void ProcessOrder()
