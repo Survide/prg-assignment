@@ -169,29 +169,25 @@ void LoadOrders()
                 if (isFound) break;
             }
 
-            Order newOrder = new Order(
-                int.Parse(orderId),
-                DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
-                DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
-                deliveryAddress,
-                double.Parse(totalAmount),
-                status,
-                thisCust,
-                thisRest,
-                null,
-                foodItems
-            );
-
-            // link the relations
-            newOrder.FromRestaurant = restaurants[restaurantId];
-            newOrder.FromCustomer = customers[customerEmail];
-
-            // place them into the Restaurant’s Order Queue and the Customer’s Order List
-            thisRest.Orders.Enqueue(newOrder);
-            thisCust.AddOrder(newOrder);
-
-            orders[orderId] = newOrder;
         }
+        Order newOrder = new Order(
+            int.Parse(orderId),
+            DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
+            DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
+            deliveryAddress,
+            double.Parse(totalAmount),
+            status,
+            thisCust,
+            thisRest,
+            null,
+            foodItems
+        );
+
+        // place them into the Restaurant’s Order Queue and the Customer’s Order List
+        thisRest.Orders.Enqueue(newOrder);
+        thisCust.AddOrder(newOrder);
+
+        orders[orderId] = newOrder;
     }
     Console.WriteLine($"{orders.Count} orders loaded!");
 }
@@ -560,6 +556,68 @@ void ModifyOrder()
 
 void DeleteOrder()
 {
+    List<string> validInputs = ["Y", "N"];
+    while (true)
+    {
+        Console.WriteLine("Delete Order");
+        Console.WriteLine("============");
+        Console.Write("Enter Customer Email: ");
+        string? email = Console.ReadLine();
+        if (email == null || !customers.ContainsKey(email))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid input / Email not found");
+            Console.ResetColor();
+            continue;
+        }
+        Console.WriteLine("Pending Orders:");
+        foreach (Order customerOrder in customers[email].Orders)
+        {
+            if (customerOrder.OrderStatus == "Pending")
+            {
+                Console.WriteLine(customerOrder.OrderId);
+            }
+        }
+        Console.Write("Enter Order ID: ");
+        string? orderId = Console.ReadLine();
+        if (orderId == null || !orders.ContainsKey(orderId))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid order ID.");
+            Console.ResetColor();
+            continue;
+        }
+        Order order = orders[orderId];
+        Console.WriteLine($"Order {order.OrderId}");
+        Console.WriteLine($"Customer {order.FromCustomer.CustomerName}");
+        Console.WriteLine("Ordered Items: ");
+        int foodItemCounter = 1;
+        foreach (OrderedFoodItem orderedFoodItem in order.OrderedFoodItems)
+        {
+            Console.WriteLine($"{foodItemCounter}. {orderedFoodItem.ItemName} - {orderedFoodItem.QtyOrdered}");
+            foodItemCounter++;
+        }
+        Console.WriteLine($"Delivery date/time: {order.DeliveryDateTime.ToString("dd/MM/yyyy HH:mm")}");
+        Console.WriteLine($"Total Amount: {order.OrderTotal.ToString("F2")}");
+        Console.WriteLine($"Order Status: {order.OrderStatus}");
+        Console.Write("Confirm deletion? [Y/N]: ");
+        string? confirm = Console.ReadLine();
+        if (confirm == null || !validInputs.Contains(confirm))
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid input.");
+            Console.ResetColor();
+            Console.WriteLine();
+            continue;
+        }
+        if (confirm == "Y")
+        {
+            order.OrderStatus = "Cancelled";
+            refundStack.Add(order);
+            Console.WriteLine(
+                $"Order {order.OrderId} cancelled. Refund of ${order.OrderTotal.ToString("F2")} processed.");
+        }
+    }
 }
 
 void MainMenu()
