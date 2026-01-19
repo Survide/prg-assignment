@@ -109,8 +109,8 @@ void LoadCustomers()
         string[] split = record.Split(",");
         (string name, string email) = (split[0], split[1]);
 
-        //  FIXME:: Passed in empty [] for orders since Customers have to be loaded b4 orders
-        Customer c = new(email, name, []);
+        //  FIXME:: Did not pass in Orders as Customers have to be loaded b4 orders
+        Customer c = new(email, name);
         customers[email] = c;
     }
 
@@ -168,18 +168,18 @@ void LoadOrders()
                 if (isFound) break;
             }
 
-            Order newOrder = new Order(int.Parse(orderId), DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), deliveryAddress, double.Parse(totalAmount), status, null, foodItems);
-
-            // link the relations
-            newOrder.FromRestaurant = restaurants[restaurantId];
-            newOrder.FromCustomer = customers[customerEmail];
-
-            // place them into the Restaurant’s Order Queue and the Customer’s Order List
-            thisRest.Orders.Enqueue(newOrder);
-            thisCust.AddOrder(newOrder);
-
-            orders[orderId] = newOrder;
         }
+        Order newOrder = new Order(int.Parse(orderId), DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), DateTime.ParseExact(deliveryDate + " " + deliveryTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture), deliveryAddress, double.Parse(totalAmount), status, null, foodItems);
+
+        // link the relations
+        newOrder.FromRestaurant = restaurants[restaurantId];
+        newOrder.FromCustomer = customers[customerEmail];
+
+        // place them into the Restaurant’s Order Queue and the Customer’s Order List
+        thisRest.Orders.Enqueue(newOrder);
+        thisCust.AddOrder(newOrder);
+
+        orders[orderId] = newOrder;
     }
     Console.WriteLine($"{orders.Count} orders loaded!");
 }
@@ -293,7 +293,8 @@ void CreateOrder()
     orders[newOrder.OrderId.ToString()] = newOrder;
     
     thisRest.Orders.Enqueue(newOrder);
-    thisCust.Orders.Add(newOrder);
+    thisCust.AddOrder(newOrder);
+    orders[newOrder.OrderId.ToString()] = newOrder;
 
     // create csv item
     string orderStr = $"{newOrder.OrderId},{newOrder.FromCustomer.EmailAddress},{newOrder.FromRestaurant.RestaurantId},{date},{time},{address},{newOrder.OrderDateTime:dd/MM/yyyy HH:mm},{orderTotal},{newOrder.OrderStatus},\"{string.Join("|",itemsParsed)}\"";
@@ -301,9 +302,7 @@ void CreateOrder()
     // append order to orders.csv 
     File.AppendAllText("data/orders.csv", orderStr);
 
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine($"\nOrder {newOrder.OrderId} created successfully! Status: {newOrder.OrderStatus}");
-    Console.ResetColor();
+    Helper.PrintColour(ConsoleColor.Green, $"\nOrder {newOrder.OrderId} created successfully! Status: {newOrder.OrderStatus}");
 }
 
 void ProcessOrder()
@@ -312,6 +311,89 @@ void ProcessOrder()
 
 void ModifyOrder()
 {
+    Console.WriteLine("Modify Order");
+    Console.WriteLine("============");
+
+    string email = Helper.GetValidInput("Enter Customer Email: ", "Invalid email entered.", s => customers.ContainsKey(s));
+    Customer thisCust = customers[email];
+
+    // display all orders that are pending for this customer
+    Console.WriteLine("Pending Orders: ");
+    foreach(Order order in thisCust.Orders) {
+        if (order.OrderStatus == "Pending") {
+            // FIXME: duplicate orderIds  
+            Console.WriteLine(order.OrderId);
+        }
+    }
+    string orderId = Helper.GetValidInput("\nEnter Order ID: ", "Invalid Order Id entered.", s => orders.ContainsKey(s) && orders[s].FromCustomer.EmailAddress == email);
+
+    // display order items 
+    Order thisOrder = orders[orderId];
+    thisOrder.DisplayOrderedFoodItems();
+
+    // display delivery info 
+    Console.WriteLine("Address: ");
+    Console.WriteLine(thisOrder.DeliveryAddress);
+    Console.WriteLine("Delivery Date/Time: ");
+    Console.WriteLine(thisOrder.DeliveryDateTime);
+
+    // Console.WriteLine("Modify: [1] Items [2] Address [3] Delivery Time: ");
+    string option = Helper.GetValidInput("\nModify: [1] Items [2] Address [3] Delivery Time: ", "Invalid option entered.", s => s == "1" || s == "2" || s == "3");
+
+    if (option == "1") {
+        // items 
+        // FIXME: Assume that modify items only modifies quantity 
+        List<OrderedFoodItem> orderedFoodItems = thisOrder.OrderedFoodItems;
+        int itemNumber = int.Parse(Helper.GetValidInput("Enter order item number to modify: ", "Invalid item number entered.", s => int.TryParse(s, out int val) && val > 0 && val <= orderedFoodItems.Count));
+        itemNumber--;
+
+        int newQty = int.Parse(Helper.GetValidInput("Enter new quantity: ", "Invalid quantity entered", s => int.TryParse(s, out int val) && val >= 0));
+        int currentQty = orderedFoodItems[itemNumber].QtyOrdered;
+        double priceDiff = orderedFoodItems[itemNumber].ItemPrice * Math.Abs(newQty - currentQty);
+
+        // prompt the user to pay if there is an increase in the order total 
+        if (newQty > currentQty) {
+            string ifPayment = Helper.GetValidInput("Proceed to payment? [Y/N]: ", "Invalid input.", s => s.Equals("Y", StringComparison.OrdinalIgnoreCase) || s.Equals("N", StringComparison.OrdinalIgnoreCase)).ToUpper();
+            if(ifPayment == "N") return;
+
+            // prompt user for payment method 
+            string[] validOptions = [ "CC", "PP", "CD" ]; 
+
+            string paymentMethod = Helper.GetValidInput("\nPayment method: [CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ", "Invalid payment method entered.", s => validOptions.Contains(s, StringComparer.OrdinalIgnoreCase));
+            thisOrder.OrderPaymentMethod = paymentMethod;
+        } else if (newQty < currentQty){
+            // FIXME: Assume that there will be a refund 
+            Helper.PrintColour(ConsoleColor.Green, $"${priceDiff:f2} will be refunded.");
+        }
+
+        // remove this order if the quantity is 0 
+        if (newQty == 0) {
+            thisOrder.RemoveOrderedFoodItem(orderedFoodItems[itemNumber]);
+        } else {
+            thisOrder.OrderedFoodItems[itemNumber].QtyOrdered = newQty;
+        }
+
+        Helper.PrintColour(ConsoleColor.Green, $"Order {thisOrder.OrderId} updated. Updated food items: ", () => thisOrder.DisplayOrderedFoodItems());
+
+    } else if (option == "2") {
+        // address 
+        string address = Helper.GetValidInput("Enter New Delivery Address: ", "Invalid address entered.");
+        thisOrder.DeliveryAddress = address;
+
+        // confirmation message
+        Helper.PrintColour(ConsoleColor.Green, $"Order {thisOrder.OrderId} updated. New Address: {address}");
+    } else {
+        // delivery time 
+        string time = Helper.GetValidInput("Enter Delivery Time (hh:mm): ", "Invalid time entered.", s => DateTime.TryParseExact(s, "HH:mm",    CultureInfo.InvariantCulture, DateTimeStyles.None, out _));
+        string[] timeSplit = time.Split(":");
+        (int hours, int minutes) = (int.Parse(timeSplit[0]), int.Parse(timeSplit[1]));
+
+        thisOrder.DeliveryDateTime = thisOrder.DeliveryDateTime.Date + new TimeSpan(hours, minutes, 0);        
+
+        // confirmation message
+        Helper.PrintColour(ConsoleColor.Green, $"Order {thisOrder.OrderId} updated. New Delivery Time: {time}");
+    }
+
 }
 
 void DeleteOrder()

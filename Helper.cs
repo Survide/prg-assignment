@@ -9,9 +9,15 @@ public class Helper {
             if (!string.IsNullOrEmpty(input) && (validator == null || validator(input))) {
                 return input;
             }
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine($"Error: {errorMsg}");
-            Console.ResetColor();
+            PrintColour(ConsoleColor.Red, $"Error: {errorMsg}");
         }
     }
-} 
+
+    public static void PrintColour(ConsoleColor colour, string? message = null, Action? printFunc = null) {
+        Console.ForegroundColor = colour;
+        if (message != null) Console.WriteLine(message);
+        printFunc?.Invoke();
+        Console.ResetColor();
+    }
+}
+

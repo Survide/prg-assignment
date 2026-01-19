@@ -34,3 +34,4 @@ OrderId,CustomerEmail,RestaurantId,DeliveryDate,DeliveryTime,DeliveryAddress,Cre
 1033,kevin.tan@email.com,R002,05/01/2026,19:15,321 Clementi Ave 2 #03-05,03/01/2026 11:00,29,Out for Delivery,"Pad Thai,1|Seafood Udon, 1"
 1034,daniel.wong@email.com,R006,20/01/2026,11:45,753 Woodlands Dr 50 #04-15,18/01/2026 13:52,20,Confirmed,"Miso Soup,2|Salmon Nigiri, 2"
 1035,jasmine.koh@email.com,R010,03/02/2026,11:30,753 Woodlands Dr 50 #04-15,02/02/2026 10:56,42.5,Cancelled,"Ribeye Steak,1|Grilled Asparagus, 2"
+1036,alice.tan@email.com,R001,01/01/2001,10:20,My House,18/01/2026 22:48,9.8,Pending,"Beef Burger,1"

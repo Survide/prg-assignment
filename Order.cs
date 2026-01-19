@@ -56,9 +56,11 @@ public class Order
     }
     public void DisplayOrderedFoodItems()
     {
-        foreach (OrderedFoodItem orderedFoodItem in OrderedFoodItems)
+        int itemNumber = 1;
+        foreach (OrderedFoodItem foodItem in OrderedFoodItems)
         {
-            Console.WriteLine(orderedFoodItem.ToString());
+            Console.WriteLine($"{itemNumber}. {foodItem.ItemName} - {foodItem.QtyOrdered}");
+            itemNumber++;
         }
     }
     public override string ToString()

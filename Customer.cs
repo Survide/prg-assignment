@@ -4,14 +4,12 @@ public class Customer
 {
     public string EmailAddress { get; set; }
     public string CustomerName { get; set; }
-    public List<Order> Orders { get; set; }
+    public List<Order> Orders { get; set; } = [];
 
-    public Customer(string emailAddress, string customerName, List<Order> orders)
+    public Customer(string emailAddress, string customerName) 
     {
         EmailAddress = emailAddress;
         CustomerName = customerName;
-
-        Orders = orders;
     }
 
     public void AddOrder(Order order)
