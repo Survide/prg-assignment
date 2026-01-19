@@ -3,11 +3,11 @@
 1. - [x] Load files
 2. - [x] Load files
 3. - [x] List all restaurants and menu items
-4. - [ ] List all orders with basic information
-5. - [ ] Create new order
-6. - [ ] Process an order
-7. - [ ] Modify an existing order
-8. - [ ] Delete an existing order
+4. - [x] List all orders with basic information
+5. - [x] Create new order
+6. - [x] Process an order
+7. - [x] Modify an existing order
+8. - [x] Delete an existing order
 
 # Validations and feedback
 
