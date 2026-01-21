@@ -14,3 +14,6 @@
 7. Are helper functions allowed?
 
 8. In the writeup, it says "Gruberoo charges a fee of 30% for each order". But in the sample of "create order", there wasn't this 30%. is this 30% supposed to be included or is it 30% taken from the restaurants
+
+9. For advanced features part a, what does it mean when delivery time is < 1 hour?
+10. For advanced features part a, is the function suppose to be for all restaurants or just a specific restaurant?

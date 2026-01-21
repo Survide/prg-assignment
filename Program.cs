@@ -798,6 +798,58 @@ void DeleteOrder()
     }
 }
 
+void BulkProcessOrders()
+{
+    while (true)
+    {
+        Console.Write("Enter a date (dd/mm/yyyy): ");
+        string? inputDate = Console.ReadLine();
+        if (inputDate == null)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid date input.");
+            Console.ResetColor();
+            continue;
+        }
+        bool s = DateTime.TryParseExact(
+                inputDate,
+                "dd/MM/yyyy",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out DateTime date
+            );
+        if (!s)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid date input.");
+            Console.ResetColor();
+            continue;
+        }
+        List<Order> orders = [];
+        foreach (Restaurant restaurant in restaurants.Values)
+        {
+            foreach (Order order in restaurant.Orders)
+            {
+                if (order.OrderDateTime == date && order.OrderStatus == "Pending")
+                {
+                    orders.Add(order);
+                }
+            }
+        }
+        Console.WriteLine($"Order Queue: {orders.Count}");
+        int rejectedCount = 0, preparingCount = 0;
+        foreach (Order order in orders)
+        {
+            // need check if delivery time is < 1hr
+            order.OrderStatus = "Preparing";
+            preparingCount++;
+        }
+        Console.WriteLine($"Orders Processed: {rejectedCount + preparingCount}");
+        Console.WriteLine($"Preparing: {preparingCount}, Rejected: {rejectedCount}");
+        // 1 more Console.WriteLine for num auto processed order / all orders
+    }
+}
+
 void MainMenu()
 {
     while (true)
@@ -810,6 +862,7 @@ void MainMenu()
         Console.WriteLine("4. Process an order");
         Console.WriteLine("5. Modify an existing order");
         Console.WriteLine("6. Delete an existing order");
+        Console.WriteLine("7. Bulk process orders");
         Console.WriteLine("0. Exit");
         Console.Write("Enter your choice: ");
 
@@ -852,6 +905,10 @@ void MainMenu()
         else if (option == 6)
         {
             DeleteOrder();
+        }
+        else if (option == 7)
+        {
+            BulkProcessOrders();
         }
     }
 }
