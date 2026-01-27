@@ -52,26 +52,12 @@ void LoadFoodItems()
         string description;
         string stringPrice;
         double price;
-        // theres a record that has "" in description.
-        if (record.Contains('"'))
-        {
-            string[] splitDetails = record.Split('"');
-            string[] restauranntIdAndName = splitDetails[0]
-                .Substring(0, splitDetails[0].Length - 1)
-                .Split(",");
-            restaurantId = restauranntIdAndName[0];
-            name = restauranntIdAndName[1];
-            description = splitDetails[1];
-            stringPrice = splitDetails[2].Substring(1);
-        }
-        else
-        {
-            string[] details = record.Split(",");
-            restaurantId = details[0];
-            name = details[1];
-            description = details[2];
-            stringPrice = details[3];
-        }
+
+        string[] details = record.Split(",");
+        restaurantId = details[0];
+        name = details[1];
+        description = details[2];
+        stringPrice = details[3];
         if (!double.TryParse(stringPrice, out price))
         {
             Console.WriteLine($"Could not parse price to double in line: {record}");
