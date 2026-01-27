@@ -19,7 +19,7 @@ OrderId,CustomerEmail,RestaurantId,DeliveryDate,DeliveryTime,DeliveryAddress,Cre
 1018,amanda.chua@email.com,R013,04/02/2026,12:15,321 Clementi Ave 2 #03-05,01/02/2026 22:49,29.5,Out for Delivery,"Chocolate Waffle, 2|Classic Waffle, 1"
 1019,kevin.tan@email.com,R005,12/01/2026,11:30,456 Bukit Timah Road #02-03,09/01/2026 09:10,34,Confirmed,"Garden Salad, 2|Grilled Chicken Salad, 1"
 1020,james.koh@email.com,R001,03/02/2026,13:15,246 Bedok South Ave 3 #09-01,02/02/2026 17:12,41.5,Out for Delivery,"Chicken Rice,2|Grilled Steak, 1|Caesar Salad, 1"
-1021,michael.wong@email.com,R001,22/01/2026,20:15,123 Orchard Road #05-01,21/01/2026 15:09,41.4,Cancelled,"Beef Burger, 3|Caesar Salad"
+1021,michael.wong@email.com,R001,22/01/2026,20:15,123 Orchard Road #05-01,21/01/2026 15:09,41.4,Cancelled,"Beef Burger, 3|Caesar Salad, 1"
 1022,rachel.goh@email.com,R014,04/02/2026,15:45,321 Clementi Ave 2 #03-05,03/02/2026 19:43,26.5,Preparing,"Clam Chowder, 1|Pumpkin Soup, 2"
 1023,michael.wong@email.com,R006,23/01/2026,20:45,654 Jurong West St 42 #10-11,21/01/2026 14:28,12.5,Out for Delivery,"Miso Soup, 1|Salmon Nigiri, 1"
 1024,evelyn.low@email.com,R004,14/01/2026,20:45,987 Serangoon Rd #01-02,13/01/2026 13:12,34,Confirmed,"Hawaiian Pizza, 1|Margherita Pizza, 1"
