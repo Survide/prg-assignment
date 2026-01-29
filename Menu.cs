@@ -11,7 +11,7 @@ public class Menu
         MenuId = menuId;
         MenuName = menuName;
 
-        FoodItems = [];
+        FoodItems = [new FoodItem()];
     }
 
     public void AddFoodItem(FoodItem foodItem)

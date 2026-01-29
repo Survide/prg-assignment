@@ -5,6 +5,11 @@ public class OrderedFoodItem : FoodItem
     public int QtyOrdered { get; set; }
     public double SubTotal { get; set; }
 
+    public OrderedFoodItem() : base("Fried carrot cake", "Fried carrot cake", 3.5, "")
+    {
+        QtyOrdered = 0;
+    }
+
     public OrderedFoodItem(FoodItem item, int qty)
         : base(item.ItemName, item.ItemDesc, item.ItemPrice, item.Customise)
     {

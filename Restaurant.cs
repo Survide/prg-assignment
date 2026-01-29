@@ -13,8 +13,6 @@ public class Restaurant
         string restaurantId,
         string restaurantName,
         string restaurantEmail
-    // List<Menu> menus,
-    // List<SpecialOffer> offers
     )
     {
         RestaurantId = restaurantId;
@@ -22,8 +20,8 @@ public class Restaurant
         RestaurantEmail = restaurantEmail;
 
         Orders = [];
-        Menus = [];
-        SpecialOffers = [];
+        Menus = [new Menu("main", "main menu")];
+        SpecialOffers = [new SpecialOffer("no", "default no discount", 0)];
     }
 
     public void DisplayOrders()

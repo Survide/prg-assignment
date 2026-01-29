@@ -49,7 +49,8 @@ public class Order
     // for the creation of newOrder
     public Order()
     {
-        OrderedFoodItems = [];
+        OrderStatus = "Pending";
+        OrderedFoodItems = [new OrderedFoodItem()];
     }
 
     public double CalculateOrderTotal()

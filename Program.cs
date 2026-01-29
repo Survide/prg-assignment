@@ -33,7 +33,6 @@ void LoadFoodItems()
 {
     string[] records = [];
     List<FoodItem> foodItems = [];
-    Dictionary<string, Menu> menus = []; // restaurantId: menu
     try
     {
         records = [.. File.ReadAllLines("data/fooditems.csv").Skip(1)];
@@ -46,39 +45,19 @@ void LoadFoodItems()
     }
     foreach (string record in records)
     {
-        FoodItem foodItem;
-        string restaurantId;
-        string name;
-        string description;
-        string stringPrice;
-        double price;
-
         string[] details = record.Split(",");
-        restaurantId = details[0];
-        name = details[1];
-        description = details[2];
-        stringPrice = details[3];
-        if (!double.TryParse(stringPrice, out price))
+        string restaurantId = details[0];
+        string name = details[1];
+        string description = details[2];
+        string stringPrice = details[3];
+        if (!double.TryParse(stringPrice, out double price))
         {
             Console.WriteLine($"Could not parse price to double in line: {record}");
             continue;
         }
-        foodItem = new FoodItem(name, description, price, "");
+        FoodItem foodItem = new FoodItem(name, description, price, "");
         foodItems.Add(foodItem);
-        if (menus.ContainsKey(restaurantId))
-        {
-            menus[restaurantId].AddFoodItem(foodItem);
-        }
-        else
-        {
-            menus.Add(restaurantId, new Menu(restaurantId, "Main Menu"));
-            menus[restaurantId].AddFoodItem(foodItem);
-        }
-    }
-    foreach (KeyValuePair<string, Menu> kvp in menus)
-    {
-        string restaurantId = kvp.Key;
-        restaurants[restaurantId].Menus.Add(kvp.Value);
+        restaurants[restaurantId].Menus[0].AddFoodItem(foodItem);
     }
     Console.WriteLine($"{foodItems.Count} food items loaded!");
 }

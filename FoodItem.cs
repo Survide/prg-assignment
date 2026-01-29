@@ -15,6 +15,14 @@ public class FoodItem
         Customise = customise;
     }
 
+    public FoodItem()
+    {
+      ItemName = "Fried carrot cake";
+      ItemDesc = "Fried carrot cake";
+      ItemPrice = 3.5;
+      Customise = "";
+    }
+
     public override string ToString()
     {
         return
