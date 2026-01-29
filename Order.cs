@@ -5,16 +5,16 @@ public class Order
     public int OrderId { get; set; }
     public DateTime OrderDateTime { get; set; }
     public double OrderTotal { get; set; }
-    public string OrderStatus { get; set; }
+    public string? OrderStatus { get; set; }
     public DateTime DeliveryDateTime { get; set; }
-    public string DeliveryAddress { get; set; }
-    public string OrderPaymentMethod { get; set; }
+    public string? DeliveryAddress { get; set; }
+    public string? OrderPaymentMethod { get; set; }
     public bool OrderPaid { get; set; }
 
     public List<OrderedFoodItem> OrderedFoodItems { get; set; }
-    public Restaurant FromRestaurant { get; set; }
-    public Customer FromCustomer { get; set; }
-    public SpecialOffer Offer { get; set; }
+    public Restaurant? FromRestaurant { get; set; }
+    public Customer? FromCustomer { get; set; }
+    public SpecialOffer? Offer { get; set; }
 
     public Order(
         int orderId,
@@ -25,7 +25,7 @@ public class Order
         string status,
         Customer fromCustomer,
         Restaurant fromRestaurant,
-        SpecialOffer offer,
+        SpecialOffer? offer,
         List<OrderedFoodItem> orderedFoodItems
     )
     {

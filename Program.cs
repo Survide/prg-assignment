@@ -79,7 +79,6 @@ void LoadCustomers()
         string[] split = record.Split(",");
         (string name, string email) = (split[0], split[1]);
 
-        //  FIXME:: Did not pass in Orders as Customers have to be loaded b4 orders
         Customer c = new(email, name);
         customers[email] = c;
     }
@@ -151,7 +150,7 @@ void LoadOrders()
                     break;
             }
         }
-        Order newOrder = new Order(
+        Order newOrder = new(
             int.Parse(orderId),
             DateTime.ParseExact(createdDateTime, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture),
             DateTime.ParseExact(
@@ -188,7 +187,6 @@ void ListRestaurantsAndMenu()
     {
         Console.WriteLine($"Restaurant: {restaurant.RestaurantName} ({restaurant.RestaurantId})");
 
-        // FIXME: Assume only got 1 menu
         foreach (FoodItem item in restaurant.Menus[0].FoodItems)
         {
             Console.WriteLine($"  - {item.ItemName}: {item.ItemDesc} - ${item.ItemPrice:f2}");
@@ -223,8 +221,8 @@ void ListAllOrders()
         {
             Console.WriteLine(
                 $"{order.OrderId,-10}"
-                    + $"{order.FromCustomer.CustomerName,-15}"
-                    + $"{order.FromRestaurant.RestaurantName,-20}"
+                    + $"{order.FromCustomer!.CustomerName,-15}"
+                    + $"{order.FromRestaurant!.RestaurantName,-20}"
                     + $"{order.DeliveryDateTime.ToString("dd/MM/yyyy HH:mm"),-20}"
                     + // need format
                     $"${order.OrderTotal.ToString("F2"),-7}"
@@ -287,7 +285,7 @@ void CreateOrder()
 
     // display available FoodItems
     Console.WriteLine("\nAvailable Food Items: ");
-    // FIXME: Assume only got 1 menu
+
     int itemNumber = 1;
     foreach (FoodItem item in thisRest.Menus[0].FoodItems)
     {
@@ -323,7 +321,6 @@ void CreateOrder()
         );
 
         // create new OrderedFoodItems
-        // FIXME: Assume only got 1 menu
         FoodItem foodItem = thisRest.Menus[0].FoodItems[itemNumber - 1];
         OrderedFoodItem orderedFoodItem = new(foodItem, quantity);
         orderedFoodItem.SubTotal = orderedFoodItem.CalculateSubtotal();
@@ -343,8 +340,29 @@ void CreateOrder()
         .ToUpper();
     if (ifReq == "Y")
     {
-        // FIXME: Not sure what request is for
-        string request = Helper.GetValidInput("Enter request: ", "Request cannot be empty.");
+        // display food items
+        int foodItem = 1;
+        foreach (OrderedFoodItem food in orderItems)
+        {
+            Console.WriteLine($"{foodItem}. {food.ItemName} - {food.QtyOrdered}");
+            foodItem++;
+        }
+
+        foodItem = -1;
+        while (foodItem != 0)
+        {
+            foodItem = int.Parse(
+                Helper.GetValidInput(
+                    "Enter item number (0 to finish): ",
+                    "Invalid item number entered",
+                    s => int.TryParse(s, out int val) && val >= 0 && val <= orderItems.Count
+                )
+            );
+            if (foodItem == 0)
+                break;
+            string request = Helper.GetValidInput("Enter request: ", "Request cannot be empty.");
+            orderItems[foodItem - 1].Customise = request;
+        }
     }
 
     // create new Order
@@ -363,7 +381,7 @@ void CreateOrder()
 
     // calculate order total
     Console.WriteLine(
-        $"\nOrder Total: ${newOrder.OrderTotal - 5:f2} + 30% + $5.00 (delivery) = ${newOrder.OrderTotal:f2}"
+        $"\nOrder Total: ${newOrder.OrderTotal - 5:f2} + $5.00 (delivery) = ${newOrder.OrderTotal:f2}"
     );
 
     string ifPayment = Helper
@@ -448,14 +466,14 @@ void ProcessOrder()
             Order order = restaurants[restaurantId].Orders.ElementAt(orderCounter);
 
             // Skips if don't have Pending/Cancelled/Preparing
-            if (!errorMessageDict.ContainsValue(order.OrderStatus))
+            if (!errorMessageDict.ContainsValue(order.OrderStatus!))
             {
                 orderCounter++;
                 continue;
             }
 
             Console.WriteLine($"Order {order.OrderId}");
-            Console.WriteLine($"Customer {order.FromCustomer.CustomerName}");
+            Console.WriteLine($"Customer {order.FromCustomer!.CustomerName}");
             Console.WriteLine("Ordered Items: ");
             int foodItemCounter = 1;
             foreach (OrderedFoodItem orderedFoodItem in order.OrderedFoodItems)
@@ -542,7 +560,6 @@ void ModifyOrder()
     {
         if (order.OrderStatus == "Pending")
         {
-            // FIXME: duplicate orderIds
             Console.WriteLine(order.OrderId);
         }
     }
@@ -571,8 +588,9 @@ void ModifyOrder()
     if (option == "1")
     {
         // items
-        // FIXME: Assume that modify items only modifies quantity
         List<OrderedFoodItem> orderedFoodItems = thisOrder.OrderedFoodItems;
+        int totalQuantity = 0;
+
         int itemNumber = int.Parse(
             Helper.GetValidInput(
                 "Enter order item number to modify: ",
@@ -582,11 +600,18 @@ void ModifyOrder()
         );
         itemNumber--;
 
+        // calculate the remaining quantity excluding this item
+        for (int i = 0; i < orderedFoodItems.Count; i++)
+        {
+            if (i != itemNumber)
+                totalQuantity += orderedFoodItems[i].QtyOrdered;
+        }
+
         int newQty = int.Parse(
             Helper.GetValidInput(
                 "Enter new quantity: ",
                 "Invalid quantity entered",
-                s => int.TryParse(s, out int val) && val >= 0
+                s => int.TryParse(s, out int val) && val >= 0 && (totalQuantity + val) > 0
             )
         );
         int currentQty = orderedFoodItems[itemNumber].QtyOrdered;
@@ -621,7 +646,6 @@ void ModifyOrder()
         }
         else if (newQty < currentQty)
         {
-            // FIXME: Assume that there will be a refund
             Helper.PrintColour(ConsoleColor.Green, $"${priceDiff:f2} will be refunded.");
         }
 
@@ -727,7 +751,7 @@ void DeleteOrder()
         }
         Order order = thisCust.Orders.First(o => o.OrderId == int.Parse(orderId));
         Console.WriteLine($"Order {order.OrderId}");
-        Console.WriteLine($"Customer {order.FromCustomer.CustomerName}");
+        Console.WriteLine($"Customer {order.FromCustomer!.CustomerName}");
         Console.WriteLine("Ordered Items: ");
         int foodItemCounter = 1;
         foreach (OrderedFoodItem orderedFoodItem in order.OrderedFoodItems)
@@ -786,7 +810,8 @@ void BulkProcessOrders()
             Console.WriteLine("Queue is empty for today.");
             return;
         }
-        int rejectedCount = 0, preparingCount = 0;
+        int rejectedCount = 0,
+            preparingCount = 0;
         foreach (Order order in orders)
         {
             // need check if delivery time is < 1hr
@@ -804,7 +829,9 @@ void BulkProcessOrders()
         }
         Console.WriteLine($"Orders Processed: {rejectedCount + preparingCount}");
         Console.WriteLine($"Preparing: {preparingCount}, Rejected: {rejectedCount}");
-        Console.WriteLine($"{(((preparingCount + rejectedCount) / orders.Count) * 100).ToString("F2")}");
+        Console.WriteLine(
+            $"{(((preparingCount + rejectedCount) / orders.Count) * 100).ToString("F2")}"
+        );
     }
 }
 
@@ -828,7 +855,7 @@ void DisplayTotalOrderAmount()
         // get the refunded/to be refunded orders for this restaurant
         foreach (Order order in refundStack)
         {
-            if (order.FromRestaurant.RestaurantId == thisRest.RestaurantId)
+            if (order.FromRestaurant!.RestaurantId == thisRest.RestaurantId)
             {
                 refunds += order.OrderTotal - 5;
             }
@@ -845,7 +872,6 @@ void DisplayTotalOrderAmount()
     Console.WriteLine($"Total order amount: ${totalOrderAmount:f2}");
     Console.WriteLine($"Total refund amount: ${totalRefunds:f2}");
 
-    // FIXME: Assume that Gruberoo does not earn the $5 delivery fee
     Console.WriteLine($"Total amount that Gruberoo earns: ${totalOrderAmount * 0.3:f2}");
 }
 
@@ -914,7 +940,6 @@ void MainMenu()
         {
             DisplayTotalOrderAmount();
         }
-
     }
 }
 
